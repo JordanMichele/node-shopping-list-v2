@@ -50,7 +50,22 @@ app.post('/shopping-list', jsonParser, (req, res) => {
 
 app.get('/recipes', (req, res) => {
   res.json(Recipes.get());
-})
+});
+
+app.post('/recipes', jsonParser, (req, res) => {
+  const requiredParams = ['name', 'ingredients'];
+  for(let i = 0; i < requiredParams.length; i++){
+    const fields = requiredParams[i];
+    if (!(fields in req.body)) {
+      const errMessage = `Missing \`${fields}\` in request body`
+      console.error(errMessage);
+      return res.status(400).send(errMessage);
+    }
+  }
+
+  const newRecipe = Recipes.create(req.body.name, req.body.ingredients);
+  res.status(201).json(newRecipe)
+});
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Your app is listening on port ${process.env.PORT || 8080}`);
